@@ -1,10 +1,13 @@
 package com.example.keysam;
 
+import org.springframework.stereotype.Component;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class DB_Connection {
+@Component
+public class db_Connection {
 
     public Connection getCon(){
 

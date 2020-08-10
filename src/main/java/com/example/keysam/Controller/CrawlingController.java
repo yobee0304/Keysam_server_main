@@ -1,6 +1,6 @@
 package com.example.keysam.Controller;
 
-import com.example.keysam.DB_Connection;
+import com.example.keysam.db_Connection;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.web.bind.annotation.*;
@@ -12,18 +12,20 @@ import java.sql.*;
 @RestController
 public class CrawlingController {
 
+    // DB Connection
+    private db_Connection db_connection = new db_Connection();
+    private Connection con = db_connection.getCon();
+
     // API1
     // 크롤링할 웹페이지 url 데이터를 크롤러로 전송
     @GetMapping("/spGetWebpage")
     public JSONArray getWebpage(){
 
-        DB_Connection db_connection = new DB_Connection();
         JSONArray ja = new JSONArray();
 
-        String query = "{call Keysam_Get_webpage()}";
+        String query = "{call sp_get_webpage()}";
 
         try {
-            Connection con = db_connection.getCon();
             CallableStatement stmt = con.prepareCall(query);
             boolean hadResults = stmt.execute();
 
@@ -59,14 +61,14 @@ public class CrawlingController {
     // API2
     // 크롤링한 결과 데이터를 DB에 INSERT
     @PostMapping("/spInsertArticle")
-    public String postArticle(@RequestParam("csv_file") MultipartFile file){
+    public String insertArticle(@RequestParam("csv_file") MultipartFile file){
 
         // 비어있는 파일인 경우
         if (file.isEmpty()) { ;
             return "file is empty";
         }else{
-            DB_Connection db_connection = new DB_Connection();
-            String query = "{call Keysam_Insert_article(?, ?)}";
+
+            String query = "{call sp_insert_article(?, ?)}";
 
             try{
                 byte[] bytes = file.getBytes();
@@ -84,7 +86,6 @@ public class CrawlingController {
                     try
                     {
                         // sid, url을 sp 파라미터에 넣고 실행
-                        Connection con = db_connection.getCon();
                         CallableStatement stmt = con.prepareCall(query);
                         stmt.setInt(1,sid);
                         stmt.setString(2,url);
@@ -100,7 +101,9 @@ public class CrawlingController {
                 e.printStackTrace();
             }
 
-            return "article upload success";
+            System.out.println("Insert Data Successfully");
+
+            return "article upload successfully";
         }
 
     }
