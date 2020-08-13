@@ -41,6 +41,7 @@ public class CrawlingController {
                     jo.put("sid", rs.getInt("sid"));
                     jo.put("keyword", rs.getString("keyword"));
                     jo.put("webpage", rs.getString("webpage"));
+                    jo.put("classid", rs.getString("classid"));
 
                     ja.add(jo);
                 }
