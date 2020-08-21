@@ -14,13 +14,19 @@ public class fcm {
     private String message;
     private String device_token;
 
-    fcm(String title, String message, String device_token){
+//    public fcm(String title, String message, String device_token){
+//        this.title = title;
+//        this.message = message;
+//        this.device_token = device_token;
+//    }
+
+    public void setConfig(String title, String message, String device_token){
         this.title = title;
         this.message = message;
         this.device_token = device_token;
     }
 
-    public void pushMessage() throws Exception{
+    public void pushMessage(){
         try{
             // 비공개키 경로
             String path = "/Users/cy/Computer/IdeaProjects/keysam/src/main/resources/fcm-private-key.json";
@@ -67,6 +73,7 @@ public class fcm {
 //                log.debug(res.getHeaders().toString());
 //                log.debug(res.getBody().toLowerCase());
 //            }
+            System.out.println("fcm complete");
         }catch (Exception e){
             e.printStackTrace();
         }
