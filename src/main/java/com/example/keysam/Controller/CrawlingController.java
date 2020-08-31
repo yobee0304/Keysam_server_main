@@ -2,7 +2,6 @@ package com.example.keysam.Controller;
 
 import com.example.keysam.db_Connection;
 import com.example.keysam.fcm;
-import org.apache.ibatis.jdbc.SQL;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.web.bind.annotation.*;
@@ -74,7 +73,7 @@ public class CrawlingController {
             return "file is empty";
         }else{
 
-            String query = "{call sp_insert_article(?, ?)}";
+            String query = "{call sp_insert_article(?, ?, ?)}";
             String query_token = "{call sp_get_device_token(?)}";
 
             CallableStatement stmt;
@@ -94,58 +93,58 @@ public class CrawlingController {
                 int article_cnt = 0;
 
                 for(int i=1; i<rows.length;i++){
+                    // column : cid, sid, url 순서
                     String[] column = rows[i].split(",");
-
-                    // 새로운 유저에게 article을 insert하는 경우
-                    // cid 및 device token 변경
-                    if (cid != Integer.parseInt(column[0])){
-
-                        // 첫 사용자가 아닌 모든 경우
-                        // 푸시 메시지 전송(FCM)
-                        // TODO title, message 추후 개선 예정
-                        if (cid > 0){
-                            String title = "푸시 메세지";
-                            String message = "새로운 게시물이 총 " + article_cnt + "건 추가되었습니다.";
-
-                            fcm.setConfig(title, message, device_token);
-                            fcm.pushMessage();
-                        }
-
-                        cid = Integer.parseInt(column[0]);
-                        article_cnt = 0;
-
-                        try{
-                            stmt = con.prepareCall(query_token);
-                            stmt.setInt(1, cid);
-
-                            stmt.execute();
-                            ResultSet rs = stmt.getResultSet();
-                            rs.next();
-                            device_token = rs.getString("device_token");
-
-                            stmt.close();
-                        }catch (SQLException e) {
-                            e.printStackTrace();
-                        }
-                    }
 
                     int sid = Integer.parseInt(column[1]);
                     String url = column[2];
-
-                    article_cnt++;
 
                     try
                     {
                         // sid, url을 sp 파라미터에 넣고 실행
                         stmt = con.prepareCall(query);
+                        stmt.registerOutParameter(3, Types.INTEGER);
                         stmt.setInt(1,sid);
                         stmt.setString(2,url);
 
                         stmt.execute();
+
+                        article_cnt += stmt.getInt("out_cnt");
+
                         stmt.close();
                     }catch (SQLException e){
                         e.printStackTrace();
                     }
+
+                    int new_cid = Integer.parseInt(column[0]);
+
+                    // 푸시 메세지를 발송하는 경우
+                    // 1. 기존에 cid가 존재하고 다음 cid가 다른 cid인 경우
+                    // 2. 마지막 insert인 경우
+                    // 3. 새로 추가되는 게시물 개수가 0보다 큰 경우
+//                    System.out.println("cid :" + cid + ", new cid :" + new_cid + ", article cnt :" + article_cnt);
+                    if(((cid > 0 && cid != new_cid) || i == rows.length-1) && article_cnt > 0){
+                        String message = "신규 게시물 " + Integer.toString(article_cnt) + "건 추가되었습니다!";
+
+                        try{
+                            stmt = con.prepareCall(query_token);
+                            stmt.setInt(1, cid);
+                            stmt.execute();
+                            ResultSet rs = stmt.getResultSet();
+                            rs.next();
+                            device_token = rs.getString("device_token");
+
+//                            System.out.println(device_token);
+                        }catch (SQLException e){
+                            e.printStackTrace();
+                        }
+
+                        fcm.setConfig(message, device_token);
+                        fcm.pushMessage();
+
+                        article_cnt = 0;
+                    }
+                    cid = new_cid;
                 }
 
             }catch (IOException e){

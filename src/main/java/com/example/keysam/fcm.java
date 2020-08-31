@@ -11,7 +11,7 @@ import java.util.Arrays;
 public class fcm {
 
     private String title;
-    private String message;
+    private String body;
     private String device_token;
 
 //    public fcm(String title, String message, String device_token){
@@ -20,9 +20,9 @@ public class fcm {
 //        this.device_token = device_token;
 //    }
 
-    public void setConfig(String title, String message, String device_token){
-        this.title = title;
-        this.message = message;
+    public void setConfig(String body, String device_token){
+        this.title = "Keysam";
+        this.body = body;
         this.device_token = device_token;
     }
 
@@ -43,9 +43,10 @@ public class fcm {
             headers.add("Authorization", "Bearer " + googleCredential.getAccessToken());
 
             // 푸시할 메세지 적기
+            //TODO title이 변하지 않음! 왜???
             JSONObject notification = new JSONObject();
-            notification.put("body", message);
             notification.put("title", title);
+            notification.put("body", body);
 
             JSONObject message = new JSONObject();
             message.put("token", device_token);

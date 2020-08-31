@@ -1,5 +1,6 @@
 package com.example.keysam;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
@@ -9,6 +10,8 @@ import java.sql.SQLException;
 @Component
 public class db_Connection {
 
+    // ???
+    @Bean
     public Connection getCon(){
 
         Connection con = null;
