@@ -1,9 +1,10 @@
 package com.example.keysam.Controller;
 
-import com.example.keysam.db_Connection;
+import com.example.keysam.dbConnection;
 import com.example.keysam.fcm;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,14 +15,15 @@ import java.sql.*;
 public class CrawlingController {
 
     // DB Connection
-    private db_Connection db_connection = new db_Connection();
-    private Connection con = db_connection.getCon();
+    @Autowired
+    private dbConnection dbconnection;
+    private Connection con;
 
     // API1
     // 크롤링할 웹페이지 url 데이터를 크롤러로 전송
     @GetMapping("/spGetWebpage")
     public JSONArray getWebpage(){
-
+        con = dbconnection.getCon();
         JSONArray ja = new JSONArray();
 
         String query = "{call sp_get_webpage()}";

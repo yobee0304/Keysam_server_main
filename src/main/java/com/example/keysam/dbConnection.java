@@ -1,6 +1,5 @@
 package com.example.keysam;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
@@ -8,16 +7,15 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 @Component
-public class db_Connection {
+public class dbConnection {
 
-    // ???
-    @Bean
+    private String DB_URL = "jdbc:mysql://localhost:3306/keysam?characterEncoding=UTF-8&serverTimezone=UTC";
+    private String user = "root";
+    private String pwd = "root";
+
     public Connection getCon(){
 
         Connection con = null;
-        String DB_URL = "jdbc:mysql://localhost:3306/keysam?characterEncoding=UTF-8&serverTimezone=UTC";
-        String user = "root";
-        String pwd = "root";
 
         try{
             con = DriverManager.getConnection(DB_URL, user, pwd);

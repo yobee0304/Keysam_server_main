@@ -1,6 +1,7 @@
 package com.example.keysam.Controller;
 
-import com.example.keysam.db_Connection;
+import com.example.keysam.dbConnection;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,8 +14,9 @@ import java.sql.SQLException;
 public class KeywordController {
 
     // DB Connection
-    private db_Connection db_connection = new db_Connection();
-    private Connection con = db_connection.getCon();
+    @Autowired
+    private dbConnection dbconnection;
+    private Connection con;
 
     // API4
     // 키워드 및 웹페이지 데이터 삽입
@@ -23,7 +25,7 @@ public class KeywordController {
                               @RequestParam("webpage") String webpage,
                               @RequestParam("keyword") String keyword,
                               @RequestParam("classid") String classid){
-
+        con = dbconnection.getCon();
         String query = "{call sp_insert_keyword(?, ?, ?, ?)}";
 
         try {
@@ -49,7 +51,7 @@ public class KeywordController {
     @PostMapping("/deleteKeyword")
     public String deleteKeyword(@RequestParam("sid") int sid,
                               @RequestParam("kid") int kid){
-
+        con = dbconnection.getCon();
         String query = "{call sp_delete_keyword(?, ?)}";
 
         try {

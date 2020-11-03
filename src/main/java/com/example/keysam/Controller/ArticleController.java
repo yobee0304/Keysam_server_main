@@ -1,8 +1,9 @@
 package com.example.keysam.Controller;
 
-import com.example.keysam.db_Connection;
+import com.example.keysam.dbConnection;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,13 +17,15 @@ import java.sql.SQLException;
 public class ArticleController {
 
     // DB Connection
-    private db_Connection db_connection = new db_Connection();
-    private Connection con = db_connection.getCon();
+    @Autowired
+    private dbConnection dbconnection;
+    private Connection con;
 
     // API4
     // 사용자가 보유하고 있는 게시물 데이터 반
     @GetMapping("/getArticle")
     public JSONArray getArticle(@RequestParam("cid") int cid){
+        con = dbconnection.getCon();
 
         JSONArray ja = new JSONArray();
 
